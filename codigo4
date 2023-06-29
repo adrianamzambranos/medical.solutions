@@ -1,0 +1,59 @@
+from docx import Document
+import speech_recognition as sr
+from pydub import AudioSegment
+
+def guardar_texto_en_word(datos, nombre_archivo):
+    # Crear un nuevo documento de Word
+    document = Document()
+
+    # Clasificar el texto transcrito en diferentes secciones
+    for seccion, palabras_clave in datos.items():
+        document.add_heading(seccion, level=1)
+        
+        # Buscar palabras clave en el texto transcrito
+        for palabra_clave in palabras_clave:
+            if palabra_clave in texto_transcrito:
+                document.add_paragraph(palabra_clave)
+
+    # Guardar el documento como archivo de Word
+    document.save(nombre_archivo)
+
+
+# Ruta del archivo MP3
+mp3_file = "Paciente.mp3"
+
+# Ruta de salida para el archivo WAV
+wav_file = "salida.wav"
+
+# Convertir MP3 a WAV
+audio = AudioSegment.from_mp3(mp3_file)
+audio.export(wav_file, format="wav")
+
+# Crear un objeto de reconocimiento de voz
+r = sr.Recognizer()
+
+# Transcribir el archivo WAV
+with sr.AudioFile(wav_file) as source:
+    # Leer el archivo de audio
+    audio_data = r.record(source)
+    # Realizar la transcripción utilizando el servicio de reconocimiento de voz
+    texto_transcrito = r.recognize_google(audio_data, language="es-MX")
+
+# Imprimir el texto transcrito
+print(texto_transcrito)
+
+# Definir las secciones y palabras clave para clasificar el texto
+datos = {
+    'Nombre del paciente': ['paciente'],
+    'Nombre del médico': ['médico', 'doctor'],
+    'Fecha': ['fecha'],
+    'Hora': ['hora'],
+    'Datos del paciente': ['datos'],
+    'Diagnóstico': ['diagnóstico'],
+    'Receta': ['receta'],
+    'Recomendaciones generales': ['recomendaciones']
+}
+
+# Guardar el texto clasificado en un archivo de Word
+nombre_archivo = "transcripcion.docx"
+guardar_texto_en_word(datos, nombre_archivo)
